@@ -9,7 +9,7 @@ x-minio-common: &minio-common
     - "9001"
   environment:
     MINIO_ROOT_USER: swimmer
-    MINIO_ROOT_PASSWORD: lakeco2yay
+    MINIO_ROOT_PASSWORD: datalake
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
     interval: 30s
