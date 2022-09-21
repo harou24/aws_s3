@@ -73,8 +73,17 @@ func (client *S3) Upload(bucket string, pathToFile string, key string) {
 	}
 }
 
+func (client *S3) DeleteObject(bucket string, key string) {
+	_, err := client.client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		panic("Could not delete object: " + err.Error())
+	}
+}
+
 func main() {
 	client := NewS3()
-	//	client.CreateBucket("theo")
 	spew.Dump(client)
 }
