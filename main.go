@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -49,21 +48,20 @@ func (client *S3) CreateBucket(name string) {
 	}
 }
 
-func (client *S3) Upload(bucket string) {
-	stat, err := os.Stat("test.jpg")
+func (client *S3) Upload(bucket string, pathToFile string, key string) {
+	stat, err := os.Stat(pathToFile)
 	if err != nil {
 		panic("Could not stat image " + err.Error())
 	}
-	fmt.Println("Stat->", stat)
 
-	file, err := os.Open("test.jpg")
+	file, err := os.Open(pathToFile)
 	if err != nil {
 		panic("Could not open local file " + err.Error())
 	}
 
 	_, err = client.client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:        aws.String(bucket),
-		Key:           aws.String("path/test.jpg"),
+		Key:           aws.String(key),
 		Body:          file,
 		ContentLength: stat.Size(),
 	})
@@ -77,6 +75,6 @@ func (client *S3) Upload(bucket string) {
 
 func main() {
 	client := NewS3()
-	client.CreateBucket("test222")
+	//	client.CreateBucket("theo")
 	spew.Dump(client)
 }
