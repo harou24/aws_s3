@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -44,6 +46,32 @@ func (client *S3) CreateBucket(name string) {
 
 	if err != nil {
 		panic("could not create bucket: " + err.Error())
+	}
+}
+
+func (client *S3) Upload(bucket string) {
+	stat, err := os.Stat("test.jpg")
+	if err != nil {
+		panic("Could not stat image " + err.Error())
+	}
+	fmt.Println("Stat->", stat)
+
+	file, err := os.Open("test.jpg")
+	if err != nil {
+		panic("Could not open local file " + err.Error())
+	}
+
+	_, err = client.client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket:        aws.String(bucket),
+		Key:           aws.String("path/test.jpg"),
+		Body:          file,
+		ContentLength: stat.Size(),
+	})
+
+	file.Close()
+
+	if err != nil {
+		panic("Could not upload file: " + err.Error())
 	}
 }
 
