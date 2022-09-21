@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -15,18 +16,19 @@ type S3 struct {
 }
 
 func NewS3() *S3 {
-	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("minio"))
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+	}
+
+	cfg.EndpointResolverWithOptions = aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			URL:               "http://localhost:9000",
 			SigningRegion:     "us-east-1",
 			HostnameImmutable: true,
 		}, nil
 	})
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("minio"), config.WithEndpointResolverWithOptions(customResolver))
-	if err != nil {
-		panic(err)
-	}
-	spew.Dump(cfg)
+
 	cl := s3.NewFromConfig(cfg)
 	return &S3{
 		client: cl,
@@ -47,6 +49,6 @@ func (client *S3) CreateBucket(name string) {
 
 func main() {
 	client := NewS3()
-	client.CreateBucket("hello")
+	client.CreateBucket("test222")
 	spew.Dump(client)
 }
