@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/davecgh/go-spew/spew"
 )
 
 type S3 struct {
@@ -48,7 +49,7 @@ func (client *S3) CreateBucket(name string) {
 	}
 }
 
-func (client *S3) Upload(bucket string, pathToFile string, key string) {
+func (client *S3) UploadFile(bucket string, pathToFile string, key string) {
 	stat, err := os.Stat(pathToFile)
 	if err != nil {
 		panic("Could not stat image " + err.Error())
@@ -73,6 +74,18 @@ func (client *S3) Upload(bucket string, pathToFile string, key string) {
 	}
 }
 
+func (client *S3) UploadObj(bucket string, obj []byte, key string) {
+	_, err := client.client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+		Body:   bytes.NewBuffer(obj),
+	})
+
+	if err != nil {
+		panic("Could not upload object " + err.Error())
+	}
+}
+
 func (client *S3) DeleteObject(bucket string, key string) {
 	_, err := client.client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
@@ -83,7 +96,41 @@ func (client *S3) DeleteObject(bucket string, key string) {
 	}
 }
 
+func (client *S3) ListBuckets() {
+	list, err := client.client.ListBuckets(context.TODO(), &s3.ListBucketsInput{})
+
+	if err != nil {
+		panic("Could not list buckets " + err.Error())
+	}
+
+	for _, bucket := range list.Buckets {
+		fmt.Println("Bucket: ", *bucket.Name)
+	}
+}
+
+func (client *S3) DeleteEmptyBucket(name string) {
+	_, err := client.client.DeleteBucket(context.TODO(), &s3.DeleteBucketInput{
+		Bucket: aws.String(name),
+	})
+	if err != nil {
+		panic("Could not delete bucket " + err.Error())
+	}
+}
+
+func (client *S3) ListObjects(bucket string, prefix string) {
+	list, err := client.client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(prefix),
+	})
+	if err != nil {
+		panic("Could not list objects " + err.Error())
+	}
+	for _, obj := range list.Contents {
+		fmt.Println("Object: ", obj)
+	}
+}
+
 func main() {
 	client := NewS3()
-	spew.Dump(client)
+	client.ListBuckets()
 }
