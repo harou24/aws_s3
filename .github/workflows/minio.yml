@@ -5,7 +5,7 @@ on:
 
 jobs:
   s3:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: run minio
         run: |
@@ -19,6 +19,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: "ABCDEFGHIJKLMN"
           AWS_SECRET_ACCESS_KEY: "0123456789"
+          AWS_DEFAULT_REGION: "us-east-1"
         run: |
           echo "hello" > ~/test.txt
           cat ~/test.txt
