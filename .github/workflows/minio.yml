@@ -30,3 +30,16 @@ jobs:
           aws --endpoint-url http://127.0.0.1:9000/ s3 cp s3://test-bucket/test.txt - # check content
           aws --endpoint-url http://127.0.0.1:9000/ s3 rm s3://test-bucket/test.txt # rm object
           aws --endpoint-url http://127.0.0.1:9000/ s3 rb s3://test-bucket # remove bucket
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Run tests
+        run: |
+          export AWS_ACCESS_KEY_ID="ABCDEFGHIJKLMN"
+          export AWS_SECRET_ACCESS_KEY="0123456789"
+          go test -v ./...

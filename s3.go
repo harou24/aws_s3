@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ type S3 struct {
 }
 
 func NewS3() *S3 {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("minio"))
+	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
@@ -128,9 +128,4 @@ func (client *S3) ListObjects(bucket string, prefix string) {
 	for _, obj := range list.Contents {
 		fmt.Println("Object: ", obj)
 	}
-}
-
-func main() {
-	client := NewS3()
-	client.ListBuckets()
 }
