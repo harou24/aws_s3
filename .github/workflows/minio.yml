@@ -1,4 +1,4 @@
-name: s3-local
+name: minio-s3
 
 on:
   pull_request:
