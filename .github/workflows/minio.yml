@@ -31,5 +31,10 @@ jobs:
           aws --endpoint-url http://127.0.0.1:9000/ s3 rm s3://test-bucket/test.txt # rm object
           aws --endpoint-url http://127.0.0.1:9000/ s3 rb s3://test-bucket # remove bucket
 
-      - name: Tests
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Run tests
         run: go test -v ./...
